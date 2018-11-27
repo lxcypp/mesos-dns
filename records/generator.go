@@ -394,6 +394,7 @@ type context struct {
 	slaveID  string
 	taskIPs  []net.IP
 	slaveIPs []string
+	containerIP string
 }
 
 func (rg *RecordGenerator) taskRecord(task state.Task, f state.Framework, domain string, spec labels.Func, ipSources []string, enumFW *EnumerableFramework) {
@@ -409,6 +410,7 @@ func (rg *RecordGenerator) taskRecord(task state.Task, f state.Framework, domain
 		slaveIDTail(task.SlaveID),
 		task.IPs(ipSources...),
 		task.SlaveIPs,
+		task.ContainerIPAddress(),
 	}
 
 	// use DiscoveryInfo name if defined instead of task name
@@ -453,6 +455,9 @@ func (rg *RecordGenerator) taskContextRecord(ctx context, task state.Task, f sta
 			rg.insertTaskRR(arec+".slave"+tail, sIPStr, A, enumTask)
 			rg.insertTaskRR(canonical+".slave"+tail, sIPStr, A, enumTask)
 		}
+	}
+	if ctx.containerIP != "" {
+		rg.insertTaskRR(arec+".container"+tail, ctx.containerIP, A, enumTask)
 	}
 
 	// recordName generates records for ctx.taskName, given some generation chain

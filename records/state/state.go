@@ -128,6 +128,15 @@ func (t *Task) IPs(srcs ...string) (ips []net.IP) {
 	return ips
 }
 
+func (t *Task) ContainerIPAddress() string{
+	for _, status := range(t.Statuses) {
+		if status.State == "TASK_RUNNING" {
+			return status.ContainerStatus.NetworkInfos[0].IPAddresses[0].IPAddress
+		}
+	}
+	return ""
+}
+
 // sources maps the string representation of IP sources to their functions.
 var sources = map[string]func(*Task) []string{
 	"host":    hostIPs,
